@@ -23,19 +23,22 @@
 4) 상관관계 기반 컬럼 제거 : 히트맵을 통해 Credit_Score와 상관계수가 0에 가까운 Month, Credit_Utilization_Ratio를 추가 제거해 노이즈 감소
 5) 파생변수 6개 생성 : DTI, EMI_to_Salary, Pure_Free_Cash, Age_Group, Loan_Per_Account, Investment_Ratio (기존 컬럼과 중복 없이 설계)
 6) 결측값 처리 : Credit_Score 결측 행 dropna로 제거
+7) Feature Selection (RandomForest 중요도 기반) : 학습된 RandomForest의 feature_importances_를 활용해 중요도 하위 5% 피처를 제거, 노이즈 변수를 줄여 과적합 방지
 
 ### 6. EDA 및 해석
 
 > 수치형 컬럼과 Credit_Score 간 상관관계 히트맵
 
-![상관관계 히트맵](이미지_경로_입력)
+<img width="552" height="682" alt="image" src="https://github.com/user-attachments/assets/68d707c2-d854-4883-972f-484924acd6c6" />
+
 
 - Credit_Score와 상관계수가 유의미한 컬럼을 선별하고, 0에 가까운 변수(Month, Credit_Utilization_Ratio)를 제거
 - 파생변수(DTI, EMI_to_Salary 등)를 추가해 신용 위험을 다각도로 수치화
 
 > 타겟 후보 시각화 (Unique Value Count 기준 막대 그래프)
 
-![타겟 후보 그래프](이미지_경로_입력)
+<img width="1002" height="553" alt="image" src="https://github.com/user-attachments/assets/c5651eec-3d7c-4eba-b096-689243132f84" />
+
 
 - 고유값 2~10개 조건으로 후보 컬럼을 추출하고, Credit_Score가 분류 문제에 가장 적합한 타겟임을 시각적으로 확인
 
@@ -43,7 +46,8 @@
 
 > 모델 비교 결과
 
-![모델 비교 결과](이미지_경로_입력)
+<img width="259" height="71" alt="image" src="https://github.com/user-attachments/assets/d96cd09c-f27f-46e2-9518-275268eb5666" />
+
 
 - RandomForest / XGBoost / LightGBM 세 모델을 동일 조건에서 비교, F1-Score(macro) 기준 RandomForest가 최고 성능 기록
 - RandomForest의 `feature_importances_` 기반으로 중요도 하위 5% 피처 제거 → 노이즈 감소 및 과적합 방지
@@ -54,19 +58,13 @@
 
 ### 8. 성능 결과
 
-> Validation Accuracy 학습 곡선
-
-![학습 곡선](이미지_경로_입력)
+Train Loss: 0.4785 | Valid Acc: 0.8148 | Best Acc: 0.8158
 
 | 구분 | 내용 |
 |---|---|
 | 평가 지표 | Accuracy, F1-Score (macro) |
 | 모니터링 방식 | 10 epoch마다 Valid Acc 출력 + Best Acc 갱신 |
 | 목표 기준 | Valid Score 75 이상 |
-
-```
-[epoch] Train Loss: x.xxxx | Valid Acc: x.xxxx | Best Acc: x.xxxx
-```
 
 ### 9. 개선 과정 요약
 - 1차: Adam(lr=0.0003), epoch 100 → 학습률 낮아 수렴 부족
